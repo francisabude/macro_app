@@ -1,0 +1,92 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "2218fc34-ade5-47fd-8f27-2ac37a355fd4",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import streamlit as st\n",
+    "import pandas as pd\n",
+    "import plotly.express as px\n",
+    "\n",
+    "# Title\n",
+    "st.set_page_config(page_title=\"WAMZ Macroeconomic Dashboard\", layout=\"wide\")\n",
+    "st.title(\"📊 WAMZ Macroeconomic Dashboard\")\n",
+    "\n",
+    "# Sidebar filters\n",
+    "st.sidebar.header(\"Filter Options\")\n",
+    "\n",
+    "# WAMZ countries\n",
+    "wamz_countries = [\"Ghana\", \"Nigeria\", \"Sierra Leone\", \"The Gambia\", \"Guinea\", \"Liberia\"]\n",
+    "selected_countries = st.sidebar.multiselect(\"Select countries\", wamz_countries, default=wamz_countries)\n",
+    "\n",
+    "# Sample indicators\n",
+    "indicators = [\"GDP (USD Billion)\", \"Inflation Rate (%)\", \"Exchange Rate (Local/USD)\", \"Current Account (% GDP)\"]\n",
+    "selected_indicator = st.sidebar.selectbox(\"Select Indicator\", indicators)\n",
+    "\n",
+    "# Sample data (you can replace with actual database or CSV)\n",
+    "def load_mock_data():\n",
+    "    years = list(range(2015, 2025))\n",
+    "    data = []\n",
+    "\n",
+    "    for country in wamz_countries:\n",
+    "        for year in years:\n",
+    "            data.append({\n",
+    "                \"Country\": country,\n",
+    "                \"Year\": year,\n",
+    "                \"GDP (USD Billion)\": round(10 + 5 * wamz_countries.index(country) + (year - 2015) * 0.5, 2),\n",
+    "                \"Inflation Rate (%)\": round(5 + wamz_countries.index(country) * 2 + (year - 2015) * 0.3, 2),\n",
+    "                \"Exchange Rate (Local/USD)\": round(5 + wamz_countries.index(country) * 3 + (year - 2015) * 0.4, 2),\n",
+    "                \"Current Account (% GDP)\": round(-5 + wamz_countries.index(country) * 1 + (year - 2015) * 0.2, 2)\n",
+    "            })\n",
+    "    return pd.DataFrame(data)\n",
+    "\n",
+    "df = load_mock_data()\n",
+    "\n",
+    "# Filter by country\n",
+    "df_filtered = df[df[\"Country\"].isin(selected_countries)]\n",
+    "\n",
+    "# Line chart of selected indicator\n",
+    "fig = px.line(\n",
+    "    df_filtered,\n",
+    "    x=\"Year\",\n",
+    "    y=selected_indicator,\n",
+    "    color=\"Country\",\n",
+    "    markers=True,\n",
+    "    title=f\"{selected_indicator} Trends in WAMZ Countries\"\n",
+    ")\n",
+    "\n",
+    "fig.update_layout(title_x=0.5, height=500)\n",
+    "st.plotly_chart(fig, use_container_width=True)\n",
+    "\n",
+    "# Show data table\n",
+    "with st.expander(\"🔍 Show Raw Data\"):\n",
+    "    st.dataframe(df_filtered[df_filtered[\"Country\"].isin(selected_countries)])\n",
+    "\n"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python [conda env:base] *",
+   "language": "python",
+   "name": "conda-base-py"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.12.7"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
